@@ -223,12 +223,13 @@ module RubyIRCd
 
       reason = "Signed off" if reason.nil? || reason.empty?
 
+      connected_users.each do |to|
+        to.send_message ":#{@nickname}!#{@username}@#{@hostname}", 'QUIT', ":#{reason}"
+      end
+
       @channels.each_value do |channel|
         channel.part_request(self)
         #TODO Add check for chanmode +u (stripping quit messages)
-      end
-      connected_users.each do |to|
-        to.send_message ":#{@nickname}!#{@username}@#{@hostname}", 'QUIT', ":#{reason}"
       end
     end
 
