@@ -129,6 +129,13 @@ module RubyIRCd
       true
     end
 
+    def change_topic_request(user, new_topic)
+      # TODO check channel modes
+      # TODO add max topic length
+      @topic = new_topic
+      message_users ":#{user.to_identifer}", "TOPIC", @name, ":#{new_topic}"
+    end
+
     def message_request(sender, type, msg)
       #TODO add a juncture to plugins for disallowing sending messages to the receiver
       #TODO check if external messages are allowed and if the user is on the channel

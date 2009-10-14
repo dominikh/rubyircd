@@ -174,11 +174,14 @@ module RubyIRCd
       send_message ":#{@server.hostname}", 'PONG', @server.hostname, ":#{content}"
     end
 
-    def topic_command(user, channel_name)
-      #TODO add implementation to change the topic (needs at least modes)
+    def topic_command(user, channel_name, new_topic = nil)
       channel = get_channel_ensured channel_name
-      server_message RPL_NOTOPIC, channel_name, ':No topic is set' if channel.topic.empty?
-      server_message RPL_TOPIC, channel_name, ":#{channel.topic}" unless channel.topic.empty?
+      if new_topic
+        channel.change_topic_request(self, new_topic)
+      else
+        server_message RPL_NOTOPIC, channel_name, ':No topic is set' if channel.topic.empty?
+        server_message RPL_TOPIC, channel_name, ":#{channel.topic}" unless channel.topic.empty?
+      end
     end
 
     def mode_command(user, name, *params)
