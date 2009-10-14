@@ -74,7 +74,7 @@ module RubyIRCd
       output += "-#{applied_modes[:-].join}" unless applied_modes[:-].empty?
       output += ' ' + applied_params.join(' ') unless applied_params.empty?
       #FIXME actually it won't work to let the server set any mode because.. i don't know how to send the message then...
-      @users.synchronize { @users.call_each.send_message ":#{by.nickname}!#{by.username}@#{by.hostname} MODE #{@name} #{output}" if !output.empty? }
+      message_users ":#{by.to_identifier}", "MODE", @name, output
       true
     end
 
@@ -142,7 +142,7 @@ module RubyIRCd
       @users.synchronize do
         @users.each do |user|
           next if user == sender
-          user.send_message ":#{sender.nickname}!#{sender.username}@#{sender.hostname}", type, @name, ":#{msg}"
+          user.send_message ":#{sender.to_identifier}", type, @name, ":#{msg}"
         end
       end
     end
