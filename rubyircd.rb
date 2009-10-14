@@ -3,6 +3,7 @@ require 'monitor'
 require 'sync'
 require 'mutex_m'
 require 'resolv'
+require 'ident'
 
 def require_absolute filename
   require File.expand_path(File.join(File.dirname(__FILE__), filename))

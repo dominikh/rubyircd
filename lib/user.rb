@@ -18,6 +18,7 @@ module RubyIRCd
       @registered = false
       @channels = {}
       @quitting = false
+      @valid_ident = false
 
       # NOTICE AUTH :*** Looking up your hostname...
       # NOTICE AUTH :*** Checking ident
@@ -25,11 +26,23 @@ module RubyIRCd
       # NOTICE AUTH :*** Found your hostname
 
       header = ["NOTICE", "AUTH", ":***"]
+      port, ip = Socket.unpack_sockaddr_in(socket.getpeername)
+
       send_message(header + ["Looking up your hostname..."])
-      p Socket.unpack_sockaddr_in(socket.getpeername)
-      ip = Socket.unpack_sockaddr_in(socket.getpeername)[1]
       @hostname = Resolv.getname(ip)
       send_message(header + ["Found your hostname"])
+
+      send_message(header + ["Checking ident"])
+      begin
+        r = Ident.request(ip, port, @server.configuration.port)
+        if r.userid
+          @username = r.userid
+          send_message(header + ["Got ident response"])
+          @valid_ident = true
+        end
+      rescue Timeout::Error, Errno::ECONNREFUSED => e
+        send_message(header + ["No identd (auth) response"])
+      end
     end
 
     def quitting?
@@ -102,7 +115,7 @@ module RubyIRCd
     end
 
     def user_command(user, username, hostname, servername, realname)
-      @username = username
+      @username = "~#{username}" unless @valid_ident
       # @hostname = hostname
       @servername = servername
       @realname = realname
