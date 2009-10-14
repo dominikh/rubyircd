@@ -259,6 +259,10 @@ module RubyIRCd
       end
     end
 
+    def to_identifer
+      "#{@nickname}!#{@username}@#{@hostname}"
+    end
+
     private # -------------------------------------------
 
     def get_next_message

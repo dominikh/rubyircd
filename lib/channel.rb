@@ -95,7 +95,7 @@ module RubyIRCd
         @users << user
         @modes[user] = {'o' => true} if @users.size == 1
         @modes[user] ||= {}
-        @users.call_each.send_message ":#{user.nickname}!#{user.username}@#{user.hostname}", 'JOIN', @name
+        @users.call_each.send_message ":#{user.to_identifer}", 'JOIN', @name
 
         user.server_message RPL_TOPIC, @name, ":#@topic"
         userlist = @users.map do |a_user|
@@ -110,19 +110,19 @@ module RubyIRCd
       true
     end
 
+    def message_users(*message)
+      @users.synchronize do
+        @users.call_each.send_message *message
+      end
+    end
+
     def part_request(user, reason=nil, notify=false)
       if !@users.include?(user)
         user.server_message ERR_NOTONCHANNEL, @name, ':You\'re not on that channel'
         return false
       end
-      if notify
-        @users.synchronize do
-          @users.each do |in_channel|
-            #TODO: check for channelmode +u and remove part reason then
-            in_channel.send_message ":#{user.nickname}!#{user.username}@#{user.hostname}", 'PART', @name, ":#{reason}"
-          end
-        end
-      end
+      message_users ":#{user.to_identifer}", 'PART', @name, ":#{reason}" if notify
+
       @modes.delete(user)
       @users.delete(user)
       user.channel_parted self
