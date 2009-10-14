@@ -154,7 +154,6 @@ module RubyIRCd
       #TODO add a juncture to plugins for disallowing sending private messages at all
       receiver_names = reciever_list.split(",").uniq
       receiver_names.each do |name|
-        p name
         if name[0..0] == '#'
           receiver = @server.get_channel name
         else
