@@ -142,17 +142,17 @@ module RubyIRCd
       end
     end
 
-    def privmsg_command(user, reciever_list, content)
-      do_msg('PRIVMSG', reciever_list, content)
+    def privmsg_command(user, receiver_list, content)
+      do_msg('PRIVMSG', receiver_list, content)
     end
 
-    def notice_command(user, reciever_list, content)
-      do_msg('NOTICE', reciever_list, content)
+    def notice_command(user, receiver_list, content)
+      do_msg('NOTICE', receiver_list, content)
     end
 
-    def do_msg(command, reciever_list, content)
+    def do_msg(command, receiver_list, content)
       #TODO add a juncture to plugins for disallowing sending private messages at all
-      receiver_names = reciever_list.split(",").uniq
+      receiver_names = receiver_list.split(",").uniq
       receiver_names.each do |name|
         if name[0..0] == '#'
           receiver = @server.get_channel name
