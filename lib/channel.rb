@@ -95,7 +95,7 @@ module RubyIRCd
         @users << user
         @modes[user] = {'o' => true} if @users.size == 1
         @modes[user] ||= {}
-        @users.call_each.send_message ":#{user.to_identifer}", 'JOIN', @name
+        @users.call_each.send_message ":#{user.to_identifier}", 'JOIN', @name
 
         user.server_message RPL_TOPIC, @name, ":#@topic"
         userlist = @users.map do |a_user|
@@ -121,7 +121,7 @@ module RubyIRCd
         user.server_message ERR_NOTONCHANNEL, @name, ':You\'re not on that channel'
         return false
       end
-      message_users ":#{user.to_identifer}", 'PART', @name, ":#{reason}" if notify
+      message_users ":#{user.to_identifier}", 'PART', @name, ":#{reason}" if notify
 
       @modes.delete(user)
       @users.delete(user)
@@ -133,7 +133,7 @@ module RubyIRCd
       # TODO check channel modes
       # TODO add max topic length
       @topic = new_topic
-      message_users ":#{user.to_identifer}", "TOPIC", @name, ":#{new_topic}"
+      message_users ":#{user.to_identifier}", "TOPIC", @name, ":#{new_topic}"
     end
 
     def message_request(sender, type, msg)
