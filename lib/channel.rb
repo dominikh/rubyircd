@@ -74,7 +74,7 @@ module RubyIRCd
       output += "-#{applied_modes[:-].join}" unless applied_modes[:-].empty?
       output += ' ' + applied_params.join(' ') unless applied_params.empty?
       #FIXME actually it won't work to let the server set any mode because.. i don't know how to send the message then...
-      message_users ":#{by.to_identifier}", "MODE", @name, output
+      message_users ":#{by.identifier}", "MODE", @name, output
       true
     end
 
@@ -95,7 +95,7 @@ module RubyIRCd
         @users << user
         @modes[user] = {'o' => true} if @users.size == 1
         @modes[user] ||= {}
-        @users.call_each.send_message ":#{user.to_identifier}", 'JOIN', @name
+        @users.call_each.send_message ":#{user.identifier}", 'JOIN', @name
 
         user.server_message RPL_TOPIC, @name, ":#@topic"
         userlist = @users.map do |a_user|
@@ -121,7 +121,7 @@ module RubyIRCd
         user.server_message ERR_NOTONCHANNEL, @name, ':You\'re not on that channel'
         return false
       end
-      message_users ":#{user.to_identifier}", 'PART', @name, ":#{reason}" if notify
+      message_users ":#{user.identifier}", 'PART', @name, ":#{reason}" if notify
 
       @modes.delete(user)
       @users.delete(user)
@@ -133,7 +133,7 @@ module RubyIRCd
       # TODO check channel modes
       # TODO add max topic length
       @topic = new_topic
-      message_users ":#{user.to_identifier}", "TOPIC", @name, ":#{new_topic}"
+      message_users ":#{user.identifier}", "TOPIC", @name, ":#{new_topic}"
     end
 
     def message_request(sender, type, msg)
@@ -142,7 +142,7 @@ module RubyIRCd
       @users.synchronize do
         @users.each do |user|
           next if user == sender
-          user.send_message ":#{sender.to_identifier}", type, @name, ":#{msg}"
+          user.send_message ":#{sender.identifier}", type, @name, ":#{msg}"
         end
       end
     end

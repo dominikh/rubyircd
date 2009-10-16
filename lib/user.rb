@@ -262,7 +262,7 @@ module RubyIRCd
       end
     end
 
-    def to_identifier
+    def identifier
       "#{@nickname}!#{@username}@#{@hostname}"
     end
 
