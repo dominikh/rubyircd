@@ -301,6 +301,12 @@ module RubyIRCd
       channel
     end
 
+    def get_user_ensured(nick)
+      user = @server.get_user nick
+      raise IrcError.new(ERR_NOSUCHNICK, nick, ":No such nick/channel") if user.nil?
+      user
+    end
+
     def debug_print(msg)
       @server.log :debug, "#{@id}: #{msg}"
     end
