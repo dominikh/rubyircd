@@ -154,8 +154,10 @@ module RubyIRCd
       @nicknames.synchronize do
         raise IrcError.new(nil) if user.nickname == new_nickname
 
-        if @nicknames.has_key?(new_nickname.downcase) and user.nickname.downcase != new_nickname.downcase
-          raise IrcError.new(ERR_NICKNAMEINUSE, "#{new_nickname} :Nickname is already in use")
+        if @nicknames.has_key?(new_nickname.downcase)
+          unless user.nickname and (user.nickname.downcase != new_nickname.downcase)
+            raise IrcError.new(ERR_NICKNAMEINUSE, "#{new_nickname} :Nickname is already in use")
+          end
         end
 
         plugins_for(:pre_nickname_change).call_each.pre_nickname_change(user, new_nickname)
