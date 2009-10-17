@@ -167,6 +167,11 @@ module RubyIRCd
             raise IrcError.new(ERR_NOSUCHNICK, name, ':No such nick/channel')
           end
         end
+
+        if command == "PRIVMSG" and receiver.is_a?(User) and receiver.away?
+          server_message RPL_AWAY, receiver.nickname, ":#{receiver.away_reason}"
+        end
+
         receiver.message_request self, command, content
       end
     end
