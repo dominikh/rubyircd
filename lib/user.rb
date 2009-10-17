@@ -23,11 +23,6 @@ module RubyIRCd
       @valid_ident = false
       @away_reason = nil
 
-      # NOTICE AUTH :*** Looking up your hostname...
-      # NOTICE AUTH :*** Checking ident
-      # NOTICE AUTH :*** No identd (auth) response
-      # NOTICE AUTH :*** Found your hostname
-
       header = ["NOTICE", "AUTH", ":***"]
       port, ip = Socket.unpack_sockaddr_in(socket.getpeername)
 
@@ -122,7 +117,6 @@ module RubyIRCd
 
     def user_command(user, username, hostname, servername, realname)
       @username ||= "~#{username}"
-      # @hostname = hostname
       @servername = servername
       @realname = realname
       check_registration

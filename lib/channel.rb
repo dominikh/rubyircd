@@ -77,14 +77,14 @@ module RubyIRCd
       output += "+#{applied_modes[:+].join}" unless applied_modes[:+].empty?
       output += "-#{applied_modes[:-].join}" unless applied_modes[:-].empty?
       output += ' ' + applied_params.join(' ') unless applied_params.empty?
-      #FIXME actually it won't work to let the server set any mode because.. i don't know how to send the message then...
+      # FIXME actually it won't work to let the server set any mode because.. i don't know how to send the message then...
       message_users ":#{by.identifier}", "MODE", @name, output
       true
     end
 
     def join_request(user, key)
-      #TODO add invite only
-      #TODO add bans
+      # TODO add invite only
+      # TODO add bans
       if @users.include?(user)
         return false
       end
@@ -146,8 +146,8 @@ module RubyIRCd
     end
 
     def message_request(sender, type, msg)
-      #TODO add a juncture to plugins for disallowing sending messages to the receiver
-      #TODO check if external messages are allowed and if the user is on the channel
+      # TODO add a juncture to plugins for disallowing sending messages to the receiver
+      # TODO check if external messages are allowed and if the user is on the channel
       @users.synchronize do
         @users.each do |user|
           next if user == sender

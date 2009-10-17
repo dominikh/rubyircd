@@ -32,7 +32,7 @@ module RubyIRCd
       @command_plugins = {}
     end
 
-    def start # blubb
+    def start
       load_plugins
       open_socket
       @thread = Thread.new do
