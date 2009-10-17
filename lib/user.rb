@@ -1,6 +1,7 @@
 module RubyIRCd
   class User
     attr_reader :channels
+    attr_reader :realname
     attr_reader :away_reason
     attr_accessor :nickname, :username, :hostname, :password
 
@@ -219,6 +220,55 @@ module RubyIRCd
     def modes_on_channel(channel)
       channel.modes_for(self)
     end
+
+    def whois_command(user, *args)
+      # TODO add support for server
+      server, nicks = nil
+      case args.size
+      when 0
+        raise IrcError.new(ERR_NONICKNAMEGIVEN, ':No nickname given') if channel.nil?
+      when 1
+        nicks = args[0]
+      else
+        server, nicks = args
+      end
+
+      nicks = nicks.split(",")
+
+      # ERR_NOSUCHSERVER
+      # [x] ERR_NONICKNAMEGIVEN
+      # [x] RPL_WHOISUSER
+      # [x] RPL_WHOISCHANNELS
+      # RPL_WHOISSERVER
+      # [x] RPL_AWAY
+      # RPL_WHOISOPERATOR
+      # RPL_WHOISIDLE
+      # [x] ERR_NOSUCHNICK
+      # [x] RPL_ENDOFWHOIS
+
+      nicks.each do |other_user|
+        other_user = get_user_ensured(other_user)
+
+        if other_user.away?
+          server_message RPL_AWAY, other_user.nickname, ":#{other_user.away_reason}"
+        end
+
+        if server
+          # TODO idle time
+        end
+
+        server_message RPL_WHOISUSER,  other_user.nickname, other_user.username, other_user.hostname, "*", ":#{other_user.realname}"
+
+        channel_string = ":" + other_user.channels.values.map { |other_channel|
+          other_channel.mode_prefix_for(other_user) + other_channel.name
+        }.join(" ")
+
+        server_message RPL_WHOISCHANNELS, other_user.nickname, channel_string
+
+        server_message RPL_ENDOFWHOIS, other_user.nickname, ":End of /WHOIS list"
+      end
+    end
+
     def check_registration
       if !@registered && !@username.nil? && !@nickname.nil?
         @server.plugins_for(:pre_registration).call_each.pre_registration(self)
