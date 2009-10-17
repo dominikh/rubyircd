@@ -15,6 +15,10 @@ module RubyIRCd
       @users.synchronize { @users }
     end
 
+    def modes_for(user)
+      @modes[user]
+    end
+
     def parse_modestring_request(by, modes, params)
       if by != @server
         raise IrcError.new(ERR_NOTONCHANNEL, self.name, ":You're not on that channel") if !@users.include? by
@@ -99,15 +103,20 @@ module RubyIRCd
 
         user.server_message RPL_TOPIC, @name, ":#@topic"
         userlist = @users.map do |a_user|
-          prefix = ''
-          prefix = '+' if @modes[a_user].has_key?("v")
-          prefix = '@' if @modes[a_user].has_key?("o")
+          prefix = mode_prefix_for(a_user)
           prefix + a_user.nickname
         end
         user.server_message RPL_NAMEREPLY, '=', @name, ':' + userlist.join(' ')
         user.server_message RPL_ENDOFNAMES, @name, ':End of /NAMES list'
       end
       true
+    end
+
+    def mode_prefix_for(user)
+      prefix = ''
+      prefix = '+' if @modes[user].has_key?("v")
+      prefix = '@' if @modes[user].has_key?("o")
+      prefix
     end
 
     def message_users(*message)
