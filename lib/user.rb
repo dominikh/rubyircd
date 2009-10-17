@@ -279,6 +279,8 @@ module RubyIRCd
         server_message RPL_MOTDSTART, ":- #{@server.hostname} Message of the day - "
         server_message RPL_MOTD, ':- MOTD not implemented yet'
         server_message RPL_ENDOFMOTD, ':End of /MOTD command'
+
+        send_message ":#{@server.hostname}", 'PING', @server.hostname, ":1234"
       end
     end
 
