@@ -40,7 +40,6 @@ module RubyIRCd
         if r.userid
           @username = r.userid
           send_message(header + ["Got ident response"])
-          @valid_ident = true
         end
       rescue Timeout::Error, Errno::ECONNREFUSED => e
         send_message(header + ["No identd (auth) response"])
@@ -121,7 +120,7 @@ module RubyIRCd
     end
 
     def user_command(user, username, hostname, servername, realname)
-      @username = "~#{username}" unless @valid_ident
+      @username ||= "~#{username}"
       # @hostname = hostname
       @servername = servername
       @realname = realname
