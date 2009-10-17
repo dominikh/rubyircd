@@ -125,7 +125,7 @@ module RubyIRCd
             user.quit "Session crashed"
           end
           @users.delete(user)
-          @nicknames.delete(user.nickname)
+          @nicknames.delete(user.nickname.downcase)
         end
         cur_id += 1
       end
