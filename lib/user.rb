@@ -1,6 +1,7 @@
 module RubyIRCd
   class User
     attr_reader :channels
+    attr_reader :away_reason
     attr_accessor :nickname, :username, :hostname, :password
 
     def initialize(server, socket, id)
@@ -19,6 +20,7 @@ module RubyIRCd
       @channels = {}
       @quitting = false
       @valid_ident = false
+      @away_reason = nil
 
       # NOTICE AUTH :*** Looking up your hostname...
       # NOTICE AUTH :*** Checking ident
@@ -43,6 +45,10 @@ module RubyIRCd
       rescue Timeout::Error, Errno::ECONNREFUSED => e
         send_message(header + ["No identd (auth) response"])
       end
+    end
+
+    def away?
+      @away_reason
     end
 
     def quitting?
@@ -152,6 +158,7 @@ module RubyIRCd
 
     def do_msg(command, receiver_list, content)
       #TODO add a juncture to plugins for disallowing sending private messages at all
+      # TODO return away message
       receiver_names = receiver_list.split(",").uniq
       receiver_names.each do |name|
         if name[0..0] == '#'
@@ -199,6 +206,20 @@ module RubyIRCd
       end
     end
 
+    def away_command(user, reason = nil)
+      reason = nil if reason.empty?
+
+      @away_reason = reason
+      if reason
+        server_message RPL_NOWAWAY, ":You have been marked as being away"
+      else
+        server_message RPL_UNAWAY, ":You are no longer marked as being away"
+      end
+    end
+
+    def modes_on_channel(channel)
+      channel.modes_for(self)
+    end
     def check_registration
       if !@registered && !@username.nil? && !@nickname.nil?
         @server.plugins_for(:pre_registration).call_each.pre_registration(self)
