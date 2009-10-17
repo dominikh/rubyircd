@@ -165,7 +165,7 @@ module RubyIRCd
         if !user.nickname.nil?
           @nicknames.delete(user.nickname.downcase)
           user.connected_users.each do |on_server|
-            on_server.send_message ":#{user.nickname}!#{user.username}@#{user.hostname}", "NICK", ":#{new_nickname}"
+            on_server.send_message ":#{user.identifier}", "NICK", ":#{new_nickname}"
           end
         end
 
